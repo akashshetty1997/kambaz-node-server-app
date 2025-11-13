@@ -41,6 +41,7 @@ if (process.env.SERVER_ENV !== "development") {
     secure: true,
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000,
+    domain: "kambaz-node-server-app-vy3q.onrender.com",
   };
 }
 
