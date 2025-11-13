@@ -15,7 +15,6 @@ import ModulesRoutes from "./Kambaz/Modules/routes.js";
 import AssignmentRoutes from "./Kambaz/Assignments/routes.js";
 import EnrollmentRoutes from "./Kambaz/Enrollments/routes.js";
 
-
 import db from "./Kambaz/Database/index.js";
 
 const app = express();
@@ -26,6 +25,8 @@ app.use(
     origin: process.env.CLIENT_URL || "http://localhost:3000",
   })
 );
+
+app.set("trust proxy", 1);
 
 const sessionOptions = {
   secret: process.env.SESSION_SECRET || "kambaz",
@@ -38,7 +39,8 @@ if (process.env.SERVER_ENV !== "development") {
   sessionOptions.cookie = {
     sameSite: "none",
     secure: true,
-    domain: process.env.SERVER_URL,
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000,
   };
 }
 
@@ -59,4 +61,7 @@ QueryParameters(app);
 WorkingWithObjects(app);
 WorkingWithArrays(app);
 
-app.listen(process.env.PORT || 4000);
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
