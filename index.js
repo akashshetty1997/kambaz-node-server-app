@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import mongoose from "mongoose";
 import cors from "cors";
 import session from "express-session";
 
@@ -41,11 +42,14 @@ if (process.env.SERVER_ENV !== "development") {
     secure: true,
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000,
-    domain: "kambaz-node-server-app-vy3q.onrender.com",
+    domain: process.env.DOMAIN,
     partitioned: true,
   };
 }
 
+const CONNECTION_STRING =
+  process.env.DATABASE_CONNECTION_STRING || "mongodb://127.0.0.1:27017/kambaz";
+mongoose.connect(CONNECTION_STRING);
 app.use(session(sessionOptions));
 
 app.use(express.urlencoded({ extended: true }));
