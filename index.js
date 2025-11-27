@@ -16,8 +16,6 @@ import ModulesRoutes from "./Kambaz/Modules/routes.js";
 import AssignmentRoutes from "./Kambaz/Assignments/routes.js";
 import EnrollmentRoutes from "./Kambaz/Enrollments/routes.js";
 
-import db from "./Kambaz/Database/index.js";
-
 const app = express();
 
 app.use(
@@ -33,33 +31,28 @@ const sessionOptions = {
   secret: process.env.SESSION_SECRET || "kambaz",
   resave: false,
   saveUninitialized: false,
-};
-
-if (process.env.SERVER_ENV !== "development") {
-  sessionOptions.proxy = true;
-  sessionOptions.cookie = {
-    sameSite: "none",
-    secure: true,
+  cookie: {
+    secure: process.env.SERVER_ENV === "production", // true in production
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000,
-    domain: process.env.DOMAIN,
-    partitioned: true,
-  };
-}
+    sameSite: process.env.SERVER_ENV === "production" ? "none" : "lax",
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+  },
+};
 
 const CONNECTION_STRING =
   process.env.DATABASE_CONNECTION_STRING || "mongodb://127.0.0.1:27017/kambaz";
 mongoose.connect(CONNECTION_STRING);
-app.use(session(sessionOptions));
 
+app.use(session(sessionOptions));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-UserRoutes(app, db);
-CourseRoutes(app, db);
-ModulesRoutes(app, db);
-AssignmentRoutes(app, db);
-EnrollmentRoutes(app, db);
+UserRoutes(app);
+CourseRoutes(app);
+ModulesRoutes(app);
+AssignmentRoutes(app);
+EnrollmentRoutes(app);
+
 Lab5(app);
 Hello(app);
 PathParameters(app);
